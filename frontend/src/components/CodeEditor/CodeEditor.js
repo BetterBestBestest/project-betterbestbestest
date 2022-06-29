@@ -20,7 +20,6 @@ const doc = connection.get(collection, id);
 
 function CodeEditor() {
   const [pageContent, setPageContent] = useState({});
-  let existingPromise = Promise.resolve();
 
   useEffect(() => {
     doc.subscribe((error) => {
@@ -31,22 +30,10 @@ function CodeEditor() {
       });
     });
   }, []);
-  const handleChange = async (content, delta, source, editor) => {
+  const handleChange = (content, delta, source, editor) => {
     if (source !== "user") return;
     console.log(editor.getContents());
-    await existingPromise;
-    const submitOpPromise = () => {
-      return new Promise((resolve, reject) => {
-        doc.submitOp(editor.getContents(), (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve("ok");
-          }
-        });
-      });
-    };
-    submitOpPromise();
+    doc.submitOp(editor.getContents());
   };
   hljs.registerLanguage("javascript", javascript);
   hljs.registerLanguage("python", python);
