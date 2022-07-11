@@ -7,6 +7,7 @@ import "./Notebook.css";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import roomsAPI from "../../api/rooms";
+import UploadFileForm from "../uploadFileForm";
 
 sharedb.types.register(richText.type);
 const socket = new ReconnectingWebSocket(process.env.REACT_APP_WS_URL);
@@ -28,6 +29,16 @@ function NoteBook() {
     <div className="notebook-container">
       <div className="notebook-body">
         <h1>NoteBook</h1>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <UploadFileForm />
+          <UploadFileForm />
+        </div>
         <div className="notebook-content">
           {codeBlockDoc && <CodeBlock doc={codeBlockDoc} />}
           {textBlockDoc && <TextBlock doc={textBlockDoc} />}

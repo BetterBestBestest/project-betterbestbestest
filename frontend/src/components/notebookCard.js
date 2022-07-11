@@ -11,6 +11,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Tooltip,
   DialogContentText,
   Button,
 } from "@material-ui/core";
@@ -151,13 +152,15 @@ const NotebookCard = ({ room, isMine, leaveRoom, deleteMyRoom }) => {
         <Grid container justifyContent="flex-end" alignItems="flex-end">
           {isMine ? (
             <div>
-              <IconButton
-                size="small"
-                color="inherit"
-                onClick={handleClickOpen}
-              >
-                <DeleteIcon />
-              </IconButton>
+              <Tooltip title="Delete">
+                <IconButton
+                  size="small"
+                  color="inherit"
+                  onClick={handleClickOpen}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Tooltip>
               <Dialog
                 open={open}
                 onClose={handleClose}
