@@ -2,65 +2,66 @@ import hljs from "highlight.js";
 import python from "highlight.js/lib/languages/python";
 import "highlight.js/styles/monokai-sublime.css";
 import ReactQuill from "react-quill";
+import Quill from "quill";
 import "react-quill/dist/quill.snow.css";
 import "./CodeBlock.css";
+import UploadFileForm from "../uploadFileForm";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function CodeBlock(props) {
   const doc = props.doc;
-  let reactQuillRef = useRef(null);
-  let quillRef = null;
 
-  hljs.registerLanguage("python", python);
+  const [quill, setQuill] = useState(null);
+
+  // hljs.registerLanguage("python", python);
 
   useEffect(() => {
-    doc.subscribe((error) => {
-      console.log(doc);
+    doc.subscribe((err) => {
+      if (err) console.log(err);
       initQuill();
-      doc.on("op", function (op, source) {
-        if (source) return;
-        console.log(op);
-        // update quill with new op
-        quillRef.updateContents(op);
-      });
     });
+    initQuill();
   }, []);
 
   const initQuill = () => {
-    if (
-      !reactQuillRef.current ||
-      typeof reactQuillRef.current.getEditor !== "function"
-    )
-      return;
-    // init quill ref
-    quillRef = reactQuillRef.current.getEditor();
-    // set initial content
-    quillRef.setContents(doc.data);
-    // create a code-block
-    quillRef.formatLine(0, quillRef.getLength(), { "code-block": true });
-    console.log(quillRef);
+    hljs.configure({
+      languages: ["javascript", "ruby", "python"],
+    });
+    const quill = new Quill("#editor-container", {
+      modules: {
+        syntax: {
+          highlight: (text) =>
+            hljs.highlight(text, { language: "python" }).value,
+        },
+        toolbar: false,
+      },
+      theme: "snow", // or 'bubble'
+    });
+    setQuill(quill);
+    quill.setContents(doc.data);
+    quill.formatLine(0, quill.getLength(), { "code-block": true });
+    quill.on("text-change", function (delta, oldDelta, source) {
+      if (source !== "user") return;
+      doc.submitOp(delta, { source: quill });
+    });
+    doc.on("op", function (op, source) {
+      if (source === quill) return;
+      quill.updateContents(op);
+    });
   };
 
-  const handleChange = (content, delta, source, editor) => {
-    if (source !== "user") return;
-    doc.submitOp(delta);
-  };
-
-  const modules = {
-    syntax: {
-      highlight: (text) => hljs.highlight(text, { language: "python" }).value,
-    },
-    toolbar: false,
-  };
+  // const modules = {
+  //   syntax: {
+  //     highlight: (text) => hljs.highlight(text, { language: "python" }).value,
+  //   },
+  //   toolbar: false,
+  // };
 
   return (
     <div className="code-block">
-      <ReactQuill
-        ref={reactQuillRef}
-        modules={modules}
-        onChange={handleChange}
-      />
+      <UploadFileForm quill={quill} doc={doc} isCode={true} />
+      <div id="editor-container"></div>
     </div>
   );
 }

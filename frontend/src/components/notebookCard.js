@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 220,
     minHeight: 250,
     marginTop: 30,
-
     background: "#f5f5f5",
   },
   root_my: {

@@ -7,7 +7,7 @@ import {
   DialogTitle,
   TextField,
 } from "@material-ui/core";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function readFileContent(file) {
   const reader = new FileReader();
@@ -18,17 +18,9 @@ function readFileContent(file) {
   });
 }
 
-function UploadFileForm() {
+function UploadFileForm({ quill, isCode, doc }) {
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-
-  useEffect(() => {
-    readFileContent(selectedFile)
-      .then((content) => {
-        console.log(content);
-      })
-      .catch((error) => console.log(error));
-  }, [selectedFile]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -38,36 +30,51 @@ function UploadFileForm() {
     setOpen(false);
   };
 
+  const handleUpload = (e) => {
+    setSelectedFile(e.target.files[0]);
+    console.log(selectedFile);
+  };
+
+  const handleSubmit = () => {
+    readFileContent(selectedFile)
+      .then((content) => {
+        console.log(content);
+        console.log(quill);
+        const delta = quill.insertText(quill.getLength(), content);
+        doc.submitOp(delta, { source: quill });
+        quill.formatLine(0, quill.getLength(), { "code-block": isCode });
+      })
+      .catch((error) => console.log(error))
+      .finally(() => {
+        setOpen(false);
+      });
+    // console.log(quill);
+    // quill.insertText(quill.getLength(), "content");
+  };
+
   return (
     <div>
       <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Open form dialog
+        Upload file
       </Button>
       <Dialog
         open={open}
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Subscribe</DialogTitle>
+        <DialogTitle id="form-dialog-title">Upload</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            To subscribe to this website, please enter your email address here.
-            We will send updates occasionally.
-          </DialogContentText>
+          <DialogContentText>uploading a file here</DialogContentText>
           <form>
-            <input
-              type="file"
-              value={selectedFile}
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-            />
+            <input type="file" name="file" onChange={handleUpload} />
           </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleClose} color="primary">
-            Subscribe
+          <Button onClick={handleSubmit} color="primary">
+            add
           </Button>
         </DialogActions>
       </Dialog>
