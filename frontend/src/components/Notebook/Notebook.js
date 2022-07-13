@@ -15,14 +15,19 @@ const connection = new sharedb.Connection(socket);
 function NoteBook() {
   let { id } = useParams();
   const [codeBlockDoc, setCodeBlockDoc] = useState(null);
+  const [data, setData] = useState(null);
   const [textBlockDoc, setTextBlockDoc] = useState(null);
   useEffect(() => {
     // hardcoded sharedb connection
     const testRoomId = id;
     roomsAPI.getRoom(testRoomId).then((data) => {
+      setData(data);
       setCodeBlockDoc(connection.get(id + "_code", data.codeSharedbID));
       setTextBlockDoc(connection.get(id + "_comment", data.commentSharedbID));
     });
+    if (codeBlockDoc) {
+      codeBlockDoc.connection.bindToSocket(socket);
+    }
   }, []);
   return (
     <div className="notebook-container">
@@ -36,7 +41,13 @@ function NoteBook() {
           }}
         ></div>
         <div className="notebook-content">
-          {codeBlockDoc && <CodeBlock doc={codeBlockDoc} />}
+          {codeBlockDoc && (
+            <CodeBlock
+              doc={codeBlockDoc}
+              collection={`${id}_code`}
+              id={data.codeSharedbID}
+            />
+          )}
           {textBlockDoc && <TextBlock doc={textBlockDoc} />}
         </div>
       </div>
