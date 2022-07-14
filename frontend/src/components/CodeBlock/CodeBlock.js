@@ -59,10 +59,14 @@ function CodeBlock(props) {
     });
 
     let presence = doc.connection.getDocPresence(props.collection, props.id);
+
     presence.subscribe(function (error) {
       if (error) throw error;
+      console.log("down");
     });
-    let localPresence = presence.create(presenceId);
+
+    let localPresence = presence.create(props.id);
+    console.log(presence);
 
     quill.on("selection-change", function (range, oldRange, source) {
       // We only need to send updates if the user moves the cursor
@@ -76,10 +80,16 @@ function CodeBlock(props) {
       // on the presence object. This ability will vary depending on
       // type.
       range.name = "test";
-      console.log(range);
+
+      console.log(localPresence);
       localPresence.submit(range, function (error) {
         if (error) throw error;
+        console.log(range);
       });
+    });
+
+    presence.on("error", function (error) {
+      console.log(error);
     });
 
     presence.on("receive", function (id, range) {
@@ -90,13 +100,6 @@ function CodeBlock(props) {
       cursors.moveCursor(id, range);
     });
   };
-
-  // const modules = {
-  //   syntax: {
-  //     highlight: (text) => hljs.highlight(text, { language: "python" }).value,
-  //   },
-  //   toolbar: false,
-  // };
 
   return (
     <div className="code-block">

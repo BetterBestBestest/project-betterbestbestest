@@ -25,9 +25,6 @@ function NoteBook() {
       setCodeBlockDoc(connection.get(id + "_code", data.codeSharedbID));
       setTextBlockDoc(connection.get(id + "_comment", data.commentSharedbID));
     });
-    if (codeBlockDoc) {
-      codeBlockDoc.connection.bindToSocket(socket);
-    }
   }, []);
   return (
     <div className="notebook-container">
