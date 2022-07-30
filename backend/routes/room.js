@@ -252,7 +252,10 @@ router.patch(
       return res
         .status(statusCode.FORBIDDEN)
         .send(Message.createErrorMessage("you need to join first"));
-    room.members.pop(req.username);
+    const index = room.members.indexOf(req.username);
+    if (index !== -1) {
+      room.members.splice(index, 1);
+    }
     const update_room = await Room.findOneAndUpdate(
       { _id: roomId },
       { members: room.members },
@@ -261,13 +264,5 @@ router.patch(
     return res.json(update_room.toObject());
   }
 );
-
-router.post("/test/", (req, res) => {
-  var name = req.body.name;
-  var id = req.body.id;
-  test(name, id, (err) => {
-    return res.json("ok");
-  });
-});
 
 module.exports = router;
