@@ -43,3 +43,18 @@
   border-color: #ccc;
   background-color: #0d1116;
 }
+
+/* element.style {
+  left: 2px;
+  top: 157.672px;
+} */
+
+.ql-tooltip {
+  left: 2px !important;
+  top: 157.672px !important;
+}
+/* td {height: 100px !important} */
+
+.ql-editor {
+  color: #c8d1d9;
+}
